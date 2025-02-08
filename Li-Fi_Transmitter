@@ -1,0 +1,37 @@
+// Transmitter Code: Sends binary data using LED
+
+const int ledPin = 9;  // LED connected to pin 9
+String message = "11100010";  // Example binary message to send
+int delayTime = 1000;  // Delay between bits (milliseconds)
+int BUiginSequence=1;
+
+void setup() {
+  pinMode(ledPin, OUTPUT);
+
+}
+
+void loop() {  //the great buigining of the coadathon that it took to make this simple thing haha.
+
+
+if (BUiginSequence==1) { //this if loop makes it so the inisilization only runs once. 
+  delay(10000);
+  digitalWrite(ledPin,HIGH);
+delay(900);                         //These delays are in time with the other computer to allow syncing between them
+digitalWrite(ledPin,LOW);
+delay(1000);
+BUiginSequence=0; //sets the value to 0 to break the loop and not run the inisilization proccess again
+}
+
+
+
+  for (int i = 0; i < message.length(); i++) { 
+    if (message[i] == '1') {
+      digitalWrite(ledPin, HIGH);  // Turn LED ON
+    } else {
+      digitalWrite(ledPin, LOW);  // Turn LED OFF
+    }
+    delay(delayTime);  // Wait for the next bit
+  }
+  delay(5000);  // Delay before repeating the message
+
+}
