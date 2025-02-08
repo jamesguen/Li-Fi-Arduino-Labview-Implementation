@@ -1,0 +1,62 @@
+// Receiver Code: Reads light pulses and decodes binary data
+
+const int sensorPin = A0;  // Light sensor connected to analog pin A0
+const int threshold = 750;  // Threshold to detect light intensity
+int startRead = 0;
+String receivedMessage = "";
+
+void setup() {
+  Serial.begin(9600);  // Start serial communication
+  pinMode(sensorPin, INPUT);
+
+}
+
+void loop() {
+  int sensorValue = analogRead(sensorPin);  // Read light sensor value
+
+      if (sensorValue > threshold && startRead == 0) { // when the sensor recieves the inisilization light, syncing begins. 
+      Serial.println("reading");                       // just a bit to see that the computer is actually reading
+      delay(2000);                                     //delay allows for computers to be intime with eachother. 
+      startRead = 1;
+     }
+  if (startRead == 1) {
+    sensorValue = analogRead(sensorPin);  // Read light sensor value
+
+    if (sensorValue > threshold) { 
+        receivedMessage += "1";  // Light detected, make a 1
+
+    } else {
+        receivedMessage += "0";  // No light detected, makes a 0
+    }
+      Serial.println(receivedMessage);
+
+    delay(1000);  // Wait for the next bit
+    if (receivedMessage.length() >= 8) {  // Ensure full 8-bit message, nothing less.
+        int decimalValue = binaryToDecimal(receivedMessage);  // Convert to decimal
+        char asciiChar = (char)decimalValue;  // Convert decimal to ASCII
+
+        Serial.print("Received Binary: ");
+        Serial.print(receivedMessage);
+        Serial.print(" | Decimal: ");
+        Serial.print(decimalValue);
+        Serial.print(" | ASCII: ");
+        Serial.write(decimalValue);  // Print ASCII character directly
+        Serial.println();  // New line for clarity
+
+        receivedMessage = "";  // Clear message for the next cycle
+        delay(5000);  // Wait before restarting
+    }
+}
+}
+// Function to convert an 8-bit binary string to decimal
+int binaryToDecimal(String binary) {
+    int decimalValue = 0;
+
+    for (int i = 0; i < 8; i++) {
+        if (binary[i] == '1') {
+            decimalValue |= (1 << (7 - i));  // Bitwise conversion from string to decimal. 
+        }
+    }
+
+    return decimalValue;
+}
